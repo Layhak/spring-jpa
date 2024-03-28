@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             if (!Files.exists(imageStoragePath)) {
                 Files.createDirectories(imageStoragePath);
             }
-            String newFileName = UUID.randomUUID()+" "+ file.getOriginalFilename().split("\\.")[1];
+            String newFileName = UUID.randomUUID()+"."+ file.getOriginalFilename().split("\\.")[1];
             Path imageFullPath = imageStoragePath.resolve(newFileName);
 
             Files.copy(file.getInputStream(), imageFullPath, StandardCopyOption.REPLACE_EXISTING);
@@ -37,6 +38,10 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public List<String> uploadMultipleFiles(MultipartFile[] files) {
-        return null;
+        return new ArrayList<>(){{
+            for (MultipartFile file:files){
+                add(uploadSingleFile(file));
+            }
+        }};
     }
 }
