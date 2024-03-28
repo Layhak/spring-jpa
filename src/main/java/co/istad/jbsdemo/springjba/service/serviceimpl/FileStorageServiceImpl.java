@@ -26,7 +26,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             if (!Files.exists(imageStoragePath)) {
                 Files.createDirectories(imageStoragePath);
             }
-            String newFileName = UUID.randomUUID()+"."+ file.getOriginalFilename().split("\\.")[1];
+            String newFileName = UUID.randomUUID() + "." + file.getOriginalFilename().split("\\.")[1];
             Path imageFullPath = imageStoragePath.resolve(newFileName);
 
             Files.copy(file.getInputStream(), imageFullPath, StandardCopyOption.REPLACE_EXISTING);
@@ -38,10 +38,23 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public List<String> uploadMultipleFiles(MultipartFile[] files) {
-        return new ArrayList<>(){{
-            for (MultipartFile file:files){
+        return new ArrayList<>() {{
+            for (MultipartFile file : files) {
                 add(uploadSingleFile(file));
             }
         }};
     }
+
+    @Override
+    public void deleteSingleFile(String filename) {
+        try {
+            Path deleteDestination = Path.of(fileStorageLocation).resolve(filename);
+            if (Files.exists(deleteDestination)) {
+                Files.deleteIfExists(deleteDestination);
+            }
+        } catch (IOException ex) {
+            ex.fillInStackTrace();
+        }
+    }
+
 }
